@@ -1,6 +1,7 @@
 # One Button Copy
 
 名前付きテキストを保存し、一覧からワンクリックでコピーできる静的 Web アプリです。
+https://nizikaze.github.io/one-button-copy/
 
 ## 公開方法
 
@@ -8,7 +9,8 @@
 2. GitHub の `Settings` → `Pages` を開く
 3. `Build and deployment` の `Source` で `Deploy from a branch` を選ぶ
 4. Branch は公開したいブランチ、Folder は `/` を選ぶ
-5. 保存後、GitHub Pages の URL で `index.html` が公開される
+5. 保存後、公開 URL は通常 `https://<GitHubユーザー名>.github.io/<リポジトリ名>/` になる
+6. 今回はユーザー名が `nizikaze`、リポジトリ名が `one-button-copy` なので `https://nizikaze.github.io/one-button-copy/` でアクセスできる
 
 ## ファイル構成
 
