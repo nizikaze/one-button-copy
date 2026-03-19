@@ -16,6 +16,7 @@ const elements = {
 
 let entries = loadEntries();
 let statusTimer;
+let draggedEntryId = null;
 
 render();
 
@@ -88,6 +89,7 @@ function persistEntries() {
 
 function render() {
   const query = elements.search.value.trim().toLowerCase();
+  const isSortingEnabled = query === "";
   const filtered = entries.filter((entry) => {
     if (!query) {
       return true;
@@ -112,6 +114,8 @@ function render() {
     time.textContent = formatDate(entry.updatedAt);
     time.dateTime = entry.updatedAt;
     value.textContent = entry.value;
+    card.dataset.entryId = entry.id;
+    card.draggable = isSortingEnabled;
 
     copyButton.addEventListener("click", async () => {
       try {
@@ -149,7 +153,58 @@ function render() {
       setStatus(`「${entry.name}」を削除しました。`);
     });
 
-    card.dataset.entryId = entry.id;
+    if (isSortingEnabled) {
+      card.addEventListener("dragstart", (event) => {
+        draggedEntryId = entry.id;
+        card.classList.add("is-dragging");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", entry.id);
+      });
+
+      card.addEventListener("dragend", () => {
+        draggedEntryId = null;
+        clearDragState();
+      });
+
+      card.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        if (!draggedEntryId || draggedEntryId === entry.id) {
+          return;
+        }
+
+        event.dataTransfer.dropEffect = "move";
+        clearDropTargets();
+        card.classList.add("is-drop-target");
+      });
+
+      card.addEventListener("dragleave", (event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) {
+          return;
+        }
+
+        card.classList.remove("is-drop-target");
+      });
+
+      card.addEventListener("drop", (event) => {
+        event.preventDefault();
+        card.classList.remove("is-drop-target");
+
+        const sourceId = draggedEntryId || event.dataTransfer.getData("text/plain");
+        if (!sourceId || sourceId === entry.id) {
+          return;
+        }
+
+        const moved = moveEntry(sourceId, entry.id);
+        if (!moved) {
+          return;
+        }
+
+        persistEntries();
+        render();
+        setStatus(`「${moved.name}」の並び順を更新しました。`);
+      });
+    }
+
     elements.list.appendChild(fragment);
   });
 
@@ -159,6 +214,20 @@ function render() {
     ? `${filteredCount} / ${totalCount} 件`
     : `${totalCount} 件`;
   elements.empty.classList.toggle("is-visible", filteredCount === 0);
+}
+
+function moveEntry(sourceId, targetId) {
+  const sourceIndex = entries.findIndex((entry) => entry.id === sourceId);
+  const targetIndex = entries.findIndex((entry) => entry.id === targetId);
+
+  if (sourceIndex === -1 || targetIndex === -1) {
+    return null;
+  }
+
+  const [movedEntry] = entries.splice(sourceIndex, 1);
+  const insertionIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+  entries.splice(insertionIndex, 0, movedEntry);
+  return movedEntry;
 }
 
 function resetForm() {
@@ -185,4 +254,17 @@ function formatDate(isoString) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+}
+
+function clearDragState() {
+  clearDropTargets();
+  document.querySelectorAll(".entry-card.is-dragging").forEach((card) => {
+    card.classList.remove("is-dragging");
+  });
+}
+
+function clearDropTargets() {
+  document.querySelectorAll(".entry-card.is-drop-target").forEach((card) => {
+    card.classList.remove("is-drop-target");
+  });
 }
