@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Button Copy</title>
+  <meta name="description" content="名前付きテキストを保存してワンクリックでコピーできるツール">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">GitHub Pages Ready</p>
+      <h1>One Button Copy</h1>
+      <p class="hero-copy">
+        よく使う文面やコード片を名前付きで保存し、一覧からすぐにコピーできます。
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel-form" aria-labelledby="editor-title">
+        <div class="panel-heading">
+          <p class="panel-kicker">Editor</p>
+          <h2 id="editor-title">保存する内容を登録</h2>
+        </div>
+
+        <form id="entry-form" class="entry-form">
+          <input type="hidden" id="entry-id">
+
+          <label class="field">
+            <span class="field-label">名前</span>
+            <input id="entry-name" name="name" type="text" maxlength="60" placeholder="例: 住所、定型文、APIキーのラベル">
+          </label>
+
+          <label class="field">
+            <span class="field-label">値</span>
+            <textarea id="entry-value" name="value" rows="8" placeholder="コピーしたい内容を入力"></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit" class="button button-primary">保存する</button>
+            <button type="button" id="reset-form" class="button button-secondary">入力をクリア</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel panel-list" aria-labelledby="list-title">
+        <div class="panel-heading">
+          <p class="panel-kicker">Library</p>
+          <h2 id="list-title">保存済み一覧</h2>
+        </div>
+
+        <div class="toolbar">
+          <label class="field search-field">
+            <span class="field-label">検索</span>
+            <input id="search-input" type="search" placeholder="名前や値で絞り込み">
+          </label>
+          <p id="entry-count" class="entry-count" aria-live="polite"></p>
+        </div>
+
+        <div id="status-message" class="status-message" aria-live="polite"></div>
+        <div id="empty-state" class="empty-state">
+          まだ保存された項目がありません。左側のフォームから登録してください。
+        </div>
+        <div id="entry-list" class="entry-list" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+
+  <template id="entry-template">
+    <article class="entry-card">
+      <div class="entry-content">
+        <div class="entry-meta">
+          <h3 class="entry-name"></h3>
+          <time class="entry-time"></time>
+        </div>
+        <pre class="entry-value"></pre>
+      </div>
+      <div class="entry-actions">
+        <button type="button" class="button button-primary action-copy">コピー</button>
+        <button type="button" class="button button-secondary action-edit">編集</button>
+        <button type="button" class="button button-ghost action-delete">削除</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
